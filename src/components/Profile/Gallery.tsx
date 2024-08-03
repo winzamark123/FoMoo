@@ -14,23 +14,37 @@ export default function Gallery({ clerkId }: { clerkId: string }) {
     return <div>No Images Available for this User</div>;
   }
 
+  const getColumnSpan = (width: number, height: number) => {
+    const aspectRatio = width / height;
+    if (aspectRatio > 1.5) return 'col-span-8'; // Wide images
+    if (aspectRatio > 1) return 'col-span-6'; // Landscape images
+    if (aspectRatio > 0.75) return 'col-span-4'; // Square-ish images
+    return 'col-span-4'; // Portrait images
+  };
+
   return (
     <main className="flex flex-col gap-4">
       <h2 className="mb-10 mt-10 font-mono text-xl font-bold">Projects</h2>
-      <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
-        {user_images.map((image) => (
-          <div
-            key={image.id}
-            className="relative flex h-72 gap-4 rounded-sm border border-black p-4"
-          >
-            <Image
-              className="rounded-sm object-cover"
-              src={image.url}
-              alt="profile"
-              fill
-            />
-          </div>
-        ))}
+      <div className="grid grid-flow-row-dense grid-cols-12 gap-5">
+        {user_images.map((image) => {
+          const columnSpan = getColumnSpan(
+            image.imageWidth || 0,
+            image.imageHeight || 0
+          );
+          return (
+            <div key={image.id} className={`flex ${columnSpan}`}>
+              <Image
+                src={image.url}
+                alt=""
+                layout="responsive"
+                width={image.imageHeight || 0}
+                height={image.imageWidth || 0}
+                objectFit="cover"
+                className="rounded-md transition-opacity duration-300 hover:cursor-pointer hover:opacity-75"
+              />
+            </div>
+          );
+        })}
       </div>
     </main>
   );
